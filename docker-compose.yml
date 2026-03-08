@@ -1,0 +1,53 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: webpoll-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: polldb
+      POSTGRES_USER: poll_user
+      POSTGRES_PASSWORD: poll_pass
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U poll_user -d polldb"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+    container_name: webpoll-backend
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    environment:
+      DATABASE_URL: postgresql://poll_user:poll_pass@db:5432/polldb
+      RESET_TOKEN: ${RESET_TOKEN:-tajny-token-zmente-mne}
+      PORT: 4000
+      NODE_ENV: production
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost}
+    volumes:
+      - backend-logs:/app/logs
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:4000}
+    container_name: webpoll-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
+  backend-logs:

@@ -1,0 +1,146 @@
+.main {
+  padding: 60px 20px;
+}
+
+.container {
+  max-width: 680px;
+  margin: 0 auto;
+  animation: fadeIn 0.5s ease both;
+}
+
+.header {
+  margin-bottom: 56px;
+}
+
+.tag {
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--accent);
+  margin-bottom: 16px;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(32px, 5vw, 48px);
+  color: var(--text);
+}
+
+.section {
+  margin-bottom: 56px;
+}
+
+.sectionTitle {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.text {
+  color: var(--text-muted);
+  line-height: 1.8;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+/* Tech grid */
+.techGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.techCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 20px 24px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: border-color 0.2s;
+}
+
+.techCard:hover {
+  border-color: var(--accent);
+}
+
+.techIcon {
+  font-size: 24px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.techName {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.techDesc {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* API list */
+.apiList {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.apiRow {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 13px;
+}
+
+.method {
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: var(--success);
+  width: 40px;
+  flex-shrink: 0;
+}
+
+code {
+  font-family: var(--font-mono);
+  color: var(--accent2);
+  flex: 1;
+}
+
+.apiDesc {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+/* GH link */
+.ghLink {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 12px 24px;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-size: 13px;
+  letter-spacing: 1px;
+  border-radius: var(--radius);
+  transition: all 0.2s;
+}
+
+.ghLink:hover {
+  background: var(--accent);
+  color: #0a0a0f;
+  opacity: 1;
+}
