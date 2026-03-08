@@ -103,7 +103,7 @@ export default function AboutPage() {
             issue na GitHubu:
           </p>
           <a
-            href="https://github.com/your-repo/webpoll/issues"
+            href="https://github.com/JackReaperCZ/PollApp/issues"
             target="_blank"
             rel="noopener noreferrer"
             className={styles.ghLink}

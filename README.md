@@ -133,7 +133,7 @@ npm run dev    # http://localhost:5173
 
 ## Hlášení chyb
 
-Otevřete issue na [GitHub Issues](https://github.com/your-org/webpoll/issues).
+Otevřete issue na [GitHub Issues](https://github.com/JackReaperCZ/PollApp/issues).
 
 ## Použité technologie
 
