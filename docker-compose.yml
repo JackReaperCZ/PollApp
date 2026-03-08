@@ -26,6 +26,7 @@ services:
       - "4000:4000"
     environment:
       DATABASE_URL: postgresql://poll_user:poll_pass@db:5432/polldb
+      DATABASE_SSL: ${DATABASE_SSL:-false}
       RESET_TOKEN: ${RESET_TOKEN:-tajny-token-zmente-mne}
       PORT: 4000
       NODE_ENV: production
@@ -44,7 +45,7 @@ services:
     container_name: webpoll-frontend
     restart: unless-stopped
     ports:
-      - "80:80"
+      - "9797:80"
     depends_on:
       - backend
 

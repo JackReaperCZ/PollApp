@@ -3,9 +3,18 @@ import logger from "./logger.js";
 
 const { Pool } = pg;
 
+const ssl =
+  process.env.DATABASE_SSL === "true"
+    ? { rejectUnauthorized: false }
+    : process.env.DATABASE_SSL === "false"
+    ? false
+    : process.env.NODE_ENV === "production"
+    ? { rejectUnauthorized: false }
+    : false;
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false,
+  ssl,
 });
 
 export async function initDB() {
