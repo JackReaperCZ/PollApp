@@ -91,7 +91,9 @@ router.post("/reset", async (req, res) => {
   const { token } = req.body;
   const RESET_TOKEN = process.env.RESET_TOKEN;
 
-  if (!token || token !== RESET_TOKEN) {
+  const a = Buffer.from(token || "", "utf8");
+  const b = Buffer.from(RESET_TOKEN || "", "utf8");
+  if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) {
     logger.warn("🔐 Neúspěšný pokus o reset – špatný token.");
     return res.status(401).json({ error: "Unauthorized." });
   }
