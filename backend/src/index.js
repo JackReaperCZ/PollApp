@@ -7,6 +7,14 @@ import logger from "./logger.js";
 
 dotenv.config();
 
+const requiredEnv = ["RESET_TOKEN"];
+for (const key of requiredEnv) {
+  if (!process.env[key]) {
+    logger.error(`Chybí proměnná prostředí: ${key}`);
+    process.exit(1);
+  }
+}
+
 const app = express();
 const PORT = process.env.PORT || 4000;
 

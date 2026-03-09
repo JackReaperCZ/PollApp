@@ -27,7 +27,7 @@ services:
     environment:
       DATABASE_URL: postgresql://poll_user:poll_pass@db:5432/polldb
       DATABASE_SSL: ${DATABASE_SSL:-false}
-      RESET_TOKEN: ${RESET_TOKEN:-tajny-token-zmente-mne}
+      RESET_TOKEN: ${RESET_TOKEN}
       PORT: 4000
       NODE_ENV: production
       FRONTEND_URL: ${FRONTEND_URL:-http://localhost}
