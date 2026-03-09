@@ -10,6 +10,8 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 4000;
 
+app.set("trust proxy", 1);
+
 // CORS — povolíme frontend origin z env nebo všechny při vývoji
 const allowedOrigins = process.env.FRONTEND_URL
   ? [process.env.FRONTEND_URL]

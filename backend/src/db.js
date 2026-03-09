@@ -28,6 +28,14 @@ export async function initDB() {
       );
     `);
 
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS poll_votes (
+        id SERIAL PRIMARY KEY,
+        ip_hash TEXT NOT NULL UNIQUE,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+    `);
+
     const { rows } = await client.query("SELECT COUNT(*) FROM poll_options");
     if (parseInt(rows[0].count) === 0) {
       await client.query(`

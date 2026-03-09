@@ -1,8 +1,18 @@
 import express from "express";
+import rateLimit from "express-rate-limit";
+import crypto from "crypto";
 import pool from "./db.js";
 import logger from "./logger.js";
 
 const router = express.Router();
+
+const voteLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Příliš mnoho požadavků. Zkuste to později." },
+});
 
 // GET /api/poll — vrátí otázku a výsledky
 router.get("/", async (req, res) => {
@@ -20,7 +30,7 @@ router.get("/", async (req, res) => {
 });
 
 // POST /api/poll/vote — uloží hlas
-router.post("/vote", async (req, res) => {
+router.post("/vote", voteLimiter, async (req, res) => {
   const { optionId } = req.body;
   logger.info(`📥 Přijetí požadavku na hlasování pro možnost ID: ${optionId}`);
 
@@ -30,17 +40,43 @@ router.post("/vote", async (req, res) => {
   }
 
   try {
-    const result = await pool.query(
-      "UPDATE poll_options SET votes = votes + 1 WHERE id = $1 RETURNING id",
-      [optionId]
-    );
+    const xf = req.headers["x-forwarded-for"];
+    const ipRaw = Array.isArray(xf) ? xf[0] : typeof xf === "string" ? xf.split(",")[0].trim() : req.ip;
+    const salt = process.env.IP_HASH_SALT || "webpoll-salt";
+    const ipHash = crypto.createHash("sha256").update(salt + "|" + ipRaw).digest("hex");
 
-    if (result.rowCount === 0) {
-      logger.warn(`⚠️ Možnost ID ${optionId} neexistuje.`);
-      return res.status(404).json({ error: "Možnost nenalezena." });
+    const client = await pool.connect();
+    try {
+      await client.query("BEGIN");
+      const ins = await client.query(
+        "INSERT INTO poll_votes (ip_hash) VALUES ($1) ON CONFLICT (ip_hash) DO NOTHING RETURNING id",
+        [ipHash]
+      );
+      if (ins.rowCount === 0) {
+        logger.warn("⚠️ Pokus o opakované hlasování z již registrované IP.");
+        await client.query("ROLLBACK");
+        return res.status(409).json({ error: "Již jste hlasovali." });
+      }
+
+      const result = await client.query(
+        "UPDATE poll_options SET votes = votes + 1 WHERE id = $1 RETURNING id",
+        [optionId]
+      );
+
+      if (result.rowCount === 0) {
+        await client.query("ROLLBACK");
+        logger.warn(`⚠️ Možnost ID ${optionId} neexistuje.`);
+        return res.status(404).json({ error: "Možnost nenalezena." });
+      }
+
+      await client.query("COMMIT");
+      logger.info(`🗳 Úspěšně přidán hlas pro možnost ID: ${optionId}`);
+    } catch (e) {
+      await client.query("ROLLBACK");
+      throw e;
+    } finally {
+      client.release();
     }
-
-    logger.info(`🗳 Úspěšně přidán hlas pro možnost ID: ${optionId}`);
 
     const { rows } = await pool.query("SELECT id, label, votes FROM poll_options ORDER BY id");
     res.json({ success: true, options: rows });
@@ -62,6 +98,7 @@ router.post("/reset", async (req, res) => {
 
   try {
     await pool.query("UPDATE poll_options SET votes = 0");
+    await pool.query("TRUNCATE poll_votes");
     logger.info("🔐 Úspěšný reset hlasování.");
     res.status(200).json({ success: true, message: "Hlasování bylo resetováno." });
   } catch (err) {
