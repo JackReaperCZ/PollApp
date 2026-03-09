@@ -92,7 +92,10 @@ export default function PollPage() {
 
         {error && (
           <div className={styles.error}>
-            <span>⚠</span> {error}
+            <span>⚠</span> {error}{" "}
+            <button className={styles.resultsBtn} onClick={loadPoll}>
+              zkusit znovu
+            </button>
           </div>
         )}
 
