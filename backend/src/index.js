@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import pollRouter from "./routes.js";
 import { initDB } from "./db.js";
 import logger from "./logger.js";
+import client from "prom-client";
 
 dotenv.config();
 
@@ -46,11 +47,19 @@ app.use((req, _res, next) => {
   next();
 });
 
+const register = new client.Registry();
+client.collectDefaultMetrics({ register });
+
 // Routes
 app.use("/api/poll", pollRouter);
 
 // Health check
 app.get("/health", (_req, res) => res.json({ status: "ok" }));
+
+app.get("/metrics", async (_req, res) => {
+  res.set("Content-Type", register.contentType);
+  res.end(await register.metrics());
+});
 
 // 404
 app.use((_req, res) => {
